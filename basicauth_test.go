@@ -8,11 +8,15 @@ import (
 	"testing"
 )
 
-func TestPassBasicAuthentication(t *testing.T) {
+func basicAuthTestServer() *httptest.Server {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello Success Authentication"))
 	}
-	ts := httptest.NewServer(BasicAuthHandleFunc(handler, "Username", "Password"))
+	return httptest.NewServer(BasicAuthHandleFunc(handler, "Username", "Password"))
+}
+
+func TestPassBasicAuthentication(t *testing.T) {
+	ts := basicAuthTestServer()
 	defer ts.Close()
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
@@ -40,10 +44,7 @@ func TestPassBasicAuthentication(t *testing.T) {
 }
 
 func TestFailBasicAuthentication(t *testing.T) {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello Fail Authentication"))
-	}
-	ts := httptest.NewServer(BasicAuthHandleFunc(handler, "Username", "Password"))
+	ts := basicAuthTestServer()
 	defer ts.Close()
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
