@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func basicAuthTestServer() *httptest.Server {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello Success Authentication"))
 	}
-	return httptest.NewServer(BasicAuthHandleFunc(handler, "Username", "Password"))
+	return httptest.NewServer(BasicAuthHandleFunc(handler, url.UserPassword("Username", "Password")))
 }
 
 func TestPassBasicAuthentication(t *testing.T) {

@@ -3,11 +3,12 @@ package auth
 import (
 	"encoding/base64"
 	"net/http"
+	"net/url"
 )
 
 type BasicAuthHandler struct {
-	username, password string
-	f                  func(w http.ResponseWriter, r *http.Request)
+	f        func(w http.ResponseWriter, r *http.Request)
+	userinfo *url.Userinfo
 }
 
 func (bh *BasicAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +23,9 @@ func (bh *BasicAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (bh *BasicAuthHandler) basicUserAndPass() string {
-	return "Basic " + base64.StdEncoding.EncodeToString([]byte(bh.username+":"+bh.password))
+	return "Basic " + base64.StdEncoding.EncodeToString([]byte(bh.userinfo.String()))
 }
 
-func BasicAuthHandleFunc(f func(w http.ResponseWriter, r *http.Request), username, password string) http.Handler {
-	return &BasicAuthHandler{username, password, f}
+func BasicAuthHandleFunc(f func(w http.ResponseWriter, r *http.Request), userinfo *url.Userinfo) http.Handler {
+	return &BasicAuthHandler{f, userinfo}
 }
